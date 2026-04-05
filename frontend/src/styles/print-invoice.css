@@ -1,0 +1,592 @@
+/* styles/print-invoice.css - FORCED COMPACT SIZE */
+
+.print-invoice-page {
+  padding: 15px;
+  max-width: 700px;
+  margin: 0 auto;
+  font-family: 'Courier New', monospace;
+}
+
+.print-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.back-btn {
+  padding: 8px 16px;
+  background: #f1f5f9;
+  color: #1e293b;
+  text-decoration: none;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.back-btn:hover {
+  background: #e2e8f0;
+}
+
+.print-btn {
+  padding: 8px 16px;
+  background: #facc15;
+  color: #1e293b;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.print-btn:hover {
+  background: #eab308;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(250,204,21,0.2);
+}
+
+/* Invoice Paper */
+.invoice-paper {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-size: 12px;
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #333;
+}
+
+.company-info {
+  padding: 0 15px;
+}
+
+.company-info h1 {
+  margin: 0;
+  font-size: 22px;
+  color: #1e293b;
+}
+
+.company-info p {
+  margin: 5px 0;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.invoice-title {
+  text-align: right;
+}
+
+.invoice-title h2 {
+  margin: 0;
+  font-size: 26px;
+  color: #1e293b;
+}
+
+.invoice-number {
+  font-size: 18px;
+  color: #facc15;
+  font-weight: bold;
+  margin-top: 3px;
+}
+
+/* Invoice Info */
+.invoice-info {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8fafc;
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.info-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.info-group:first-child {
+  justify-content: flex-start;
+}
+
+.info-group:last-child {
+  justify-content: flex-end;
+}
+
+.info-group label {
+  font-weight: bold;
+  min-width: 90px;
+  white-space: nowrap;
+}
+
+.info-group span {
+  white-space: nowrap;
+}
+
+.payment-method {
+  text-transform: capitalize;
+}
+
+.status {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 11px;
+  display: inline-block;
+  min-width: 60px;
+  text-align: center;
+}
+
+.status.paid {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status.unpaid {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Customer & Vehicle side‑by‑side layout */
+.customer-vehicle-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 25px;
+  padding: 15px 15px;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.customer-column,
+.vehicle-column {
+  flex: 1;
+  min-width: 0;
+}
+
+.customer-column h3,
+.vehicle-column h3 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #1e293b;
+}
+
+.customer-column p,
+.vehicle-column p {
+  margin: 5px 0;
+  font-size: 12px;
+  color: #334155;
+  word-break: break-word;
+}
+
+/* Services & Parts */
+.services-section,
+.parts-section {
+  margin-bottom: 20px;
+}
+
+.services-section h3,
+.parts-section h3 {
+  margin: 0 0 10px;
+  color: #1e293b;
+  font-size: 15px;
+  border-left: 4px solid #facc15;
+  padding-left: 8px;
+}
+
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-size: 11px;
+}
+
+.invoice-table th {
+  background: #1e293b;
+  color: white;
+  padding: 8px;
+  text-align: left;
+  font-size: 11px;
+}
+
+.invoice-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.invoice-table .amount {
+  text-align: right;
+  font-family: monospace;
+}
+
+.invoice-table .center {
+  text-align: center;
+}
+
+.invoice-summary {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 2px solid #333;
+  font-size: 12px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+}
+
+.summary-row.total {
+  font-size: 14px;
+  font-weight: bold;
+  border-top: 1px solid #333;
+  margin-top: 8px;
+  padding-top: 10px;
+}
+
+.balance-due {
+  color: #dc2626;
+}
+
+.paid {
+  color: #059669;
+}
+
+.invoice-footer {
+  margin-top: 25px;
+  text-align: center;
+  color: #64748b;
+  font-size: 10px;
+}
+
+.invoice-footer .terms {
+  font-size: 9px;
+  margin-top: 5px;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #facc15;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error Message */
+.error-message {
+  background: #fee2e2;
+  border: 1px solid #ef4444;
+  color: #991b1b;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.error-message a {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 6px 12px;
+  background: #ef4444;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.error-message a:hover {
+  background: #dc2626;
+}
+
+/* ========== FORCED COMPACT PRINT STYLES ========== */
+@media print {
+  /* Hide all non-print elements */
+  .print-actions,
+  .back-btn,
+  .print-btn {
+    display: none !important;
+  }
+
+  /* Reset page margins and force a custom width */
+  @page {
+    size: auto;           /* let browser choose, but we'll constrain width */
+    margin: 0.5cm;        /* small margins */
+  }
+
+
+  .invoice-header {
+    display: block !important;          /* remove flex behavior */
+    text-align: center !important;      /* center all child text */
+    margin-bottom: 5px !important;
+    padding-bottom: 2px !important;
+    border-bottom: 1px solid #ccc;      /* optional, keeps separation */
+  }
+
+  .company-info,
+  .invoice-title {
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: 100% !important;
+  }
+
+  /* Optional: move invoice title below company info (natural stacking) */
+  .invoice-title {
+    margin-top: 5px !important;
+  }
+
+  /* Adjust font sizes for better fit */
+  .company-info h1 {
+    font-size: 12pt !important;
+    margin-bottom: 2px !important;
+  }
+
+  .company-info p {
+    font-size: 8pt !important;
+    margin: 2px 0 !important;
+  }
+
+  .invoice-title h2 {
+    font-size: 10pt !important;
+    margin: 0 !important;
+  }
+
+  .invoice-number {
+    font-size: 8pt !important;
+  }
+
+  .invoice-title {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: baseline !important;
+    gap: 5px !important;
+    flex-wrap: wrap !important;  /* fallback if very narrow */
+  }
+
+  .invoice-title h2 {
+    margin: 0 !important;
+    font-size: 10pt !important;
+  }
+
+  .invoice-number {
+    font-size: 10pt !important;
+    font-weight: bold !important;
+    margin-top: 0 !important;
+    /* remove any extra spacing */
+  }
+  .invoice-title h2::after {
+    content: "  :";
+    margin-right: 2px;
+  }
+
+  /* The invoice paper becomes a fixed-width block (like a real invoice) */
+  .invoice-paper {
+    width: 80mm !important;      /* typical invoice width: 70mm */
+    max-width: 80mm !important;
+    margin: 0 auto !important;
+    padding: 2mm !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    font-size: 9pt !important;
+    background: white;
+    overflow-x: hidden;
+  }
+
+  /* Shrink all text and spacing */
+  .invoice-header {
+    padding-bottom: 2px;
+    margin-bottom: 5px;
+  }
+
+  .company-info h1 {
+    font-size: 12pt !important;
+  }
+
+  .company-info p {
+    font-size: 8pt !important;
+  }
+
+  .invoice-title h2 {
+    font-size: 10pt !important;
+  }
+
+  .invoice-number {
+    font-size: 8pt !important;
+  }
+
+  .invoice-info {
+    font-size: 8pt !important;
+    padding: 4px !important;
+  }
+
+  .info-group label {
+    min-width: 60px !important;
+    font-size: 8pt;
+  }
+
+  .status {
+    font-size: 8pt !important;
+    padding: 1px 5px !important;
+  }
+
+  .customer-vehicle-row {
+    padding: 3px !important;
+    gap: 5px !important;
+    margin-bottom: 5px !important;
+  }
+
+  .customer-column h3,
+  .vehicle-column h3 {
+    font-size: 9pt !important;
+    margin-bottom: 3px !important;
+  }
+
+  .customer-column p,
+  .vehicle-column p {
+    font-size: 7pt !important;
+    margin: 2px 0 !important;
+  }
+
+  .services-section h3,
+  .parts-section h3 {
+    font-size: 10pt !important;
+    margin: 5px 0 !important;
+  }
+
+  .invoice-table {
+    font-size: 7pt !important;
+  }
+
+  .invoice-table th,
+  .invoice-table td {
+    padding: 2px 1px !important;
+    font-size: 7pt !important;
+  }
+
+  .invoice-summary {
+    margin-top: 5px !important;
+    padding-top: 5px !important;
+  }
+
+  .summary-row {
+    font-size: 8pt !important;
+    padding: 2px 0 !important;
+  }
+
+  .summary-row.total {
+    font-size: 9pt !important;
+  }
+
+  .invoice-footer {
+    margin-top: 5px !important;
+    font-size: 6pt !important;
+  }
+
+  /* Ensure tables don't break */
+  .invoice-table {
+    word-break: break-word;
+    table-layout: fixed;
+  }
+
+  /* Force colors */
+  .status, .balance-due, .paid {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
+
+/* Responsive screen styles (unchanged) */
+@media (max-width: 768px) {
+  .print-invoice-page {
+    padding: 10px;
+  }
+
+  .invoice-paper {
+    padding: 15px;
+  }
+
+  .invoice-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .company-info h1 {
+    font-size: 20px;
+  }
+
+  .invoice-title h2 {
+    font-size: 22px;
+  }
+
+  .invoice-title {
+    text-align: left;
+  }
+
+  .info-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .info-group {
+    justify-content: space-between !important;
+    width: 100%;
+  }
+
+  .invoice-table {
+    font-size: 10px;
+  }
+
+  .invoice-table th,
+  .invoice-table td {
+    padding: 4px;
+  }
+}
+
+@media (max-width: 600px) {
+  .customer-vehicle-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .customer-column,
+  .vehicle-column {
+    flex: auto;
+  }
+}

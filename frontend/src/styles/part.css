@@ -1,0 +1,353 @@
+/* part.css - Styles for Parts Page */
+
+.parts-page {
+    width: 100%;
+  }
+  
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .header h2 {
+    margin: 0;
+    color: #1e293b;
+    font-size: 24px;
+  }
+  
+  .header-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .search-input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 250px;
+    font-size: 14px;
+  }
+  
+  .search-input:focus {
+    outline: none;
+    border-color: #facc15;
+  }
+  
+  .add-btn {
+    background: #facc15;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  
+  .add-btn:hover:not(:disabled) {
+    opacity: 0.8;
+  }
+  
+  .add-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  /* Modal Overlay */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .form-box {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    width: 450px;
+    max-width: 90%;
+    animation: slideUp 0.3s ease;
+  }
+  
+  @keyframes slideUp {
+    from {
+      transform: translateY(50px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .form-box h3 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: #1e293b;
+    font-size: 22px;
+    text-align: center;
+    border-bottom: 2px solid #facc15;
+    padding-bottom: 10px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+    width: 100%;
+  }
+  
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+  }
+  
+  .form-group input:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: #facc15;
+    box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.1);
+  }
+  
+  .error-input {
+    border: 2px solid #ef4444 !important;
+    background-color: #fef2f2;
+  }
+  
+  .error-input:focus {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+  }
+  
+  .error-message {
+    display: block;
+    color: #ef4444;
+    font-size: 12px;
+    margin-top: 5px;
+    font-weight: 500;
+  }
+  
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+  }
+  
+  .save-btn {
+    background: #16a34a;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    flex: 1;
+    font-weight: 500;
+    font-size: 14px;
+    transition: background 0.2s;
+  }
+  
+  .save-btn:hover:not(:disabled) {
+    background: #15803d;
+  }
+  
+  .cancel-btn {
+    background: #6b7280;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    flex: 1;
+    font-weight: 500;
+    font-size: 14px;
+    transition: background 0.2s;
+  }
+  
+  .cancel-btn:hover:not(:disabled) {
+    background: #4b5563;
+  }
+  
+  .save-btn:disabled,
+  .cancel-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  /* Table Styles */
+  .table-responsive {
+    overflow-x: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .table th {
+    background: #334155;
+    color: white;
+    padding: 15px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 14px;
+  }
+  
+  .table th.actions-header {
+    text-align: center;
+  }
+  
+  .table td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+    color: #334155;
+  }
+  
+  .table tbody tr:hover {
+    background: #f8fafc;
+  }
+  
+  /* Actions Cell – Icon Buttons */
+  .actions-cell {
+    text-align: center;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .edit-btn,
+  .delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 4px 8px;
+    transition: transform 0.1s;
+  }
+  
+  .edit-btn:hover:not(:disabled) {
+    transform: scale(1.1);
+    color: #f97316;
+  }
+  
+  .delete-btn:hover:not(:disabled) {
+    transform: scale(1.1);
+    color: #dc2626;
+  }
+  
+  .edit-btn:disabled,
+  .delete-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  /* Status Badges */
+  .status-badge {
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+  }
+  
+  .status-active {
+    background: #d1fae5;
+    color: #065f46;
+  }
+  
+  .status-pending {
+    background: #fed7aa;
+    color: #92400e;
+  }
+  
+  .status-inactive {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+  
+  .text-center {
+    text-align: center;
+    color: #64748b;
+    padding: 30px !important;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+    }
+    
+    .header-right {
+      flex-direction: column;
+    }
+    
+    .search-input {
+      width: 100%;
+    }
+  
+    .form-box {
+      width: 95%;
+      padding: 20px;
+    }
+  
+    .form-row {
+      flex-direction: column;
+      gap: 0 !important;
+    }
+  
+    .table th,
+    .table td {
+      padding: 10px;
+      font-size: 13px;
+    }
+  
+    .edit-btn,
+    .delete-btn {
+      font-size: 1rem;
+      padding: 3px 6px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .table th,
+    .table td {
+      padding: 8px;
+      font-size: 12px;
+    }
+  
+    .edit-btn,
+    .delete-btn {
+      font-size: 0.9rem;
+    }
+  }
