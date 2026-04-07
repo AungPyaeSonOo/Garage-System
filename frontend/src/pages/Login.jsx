@@ -1,7 +1,7 @@
 // pages/Login.jsx
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";  // 👈 use your api instance instead of axios directly
 import "../styles/auth.css";
 
 function Login({ onLogin }) {
@@ -51,16 +51,13 @@ function Login({ onLogin }) {
 
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:5000/users/login", formData);
+      // ✅ Use the api instance – baseURL is already configured
+      const response = await api.post("/users/login", formData);
       
-      // Save token and user data
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
       
-      // Call onLogin callback
       if (onLogin) onLogin(response.data.user);
-      
-      // Redirect to dashboard
       navigate("/");
       
     } catch (error) {
