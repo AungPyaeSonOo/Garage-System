@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// Use environment variable – fallback for local dev
+// Use environment variable – empty in production (same origin), localhost in dev
 const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const api = axios.create({
@@ -24,6 +24,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      // Token expired or invalid
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';
