@@ -1,6 +1,14 @@
 {
-    "buildCommand": "cd frontend && npm install && npm run build",
-    "outputDirectory": "frontend/dist",
-    "devCommand": "cd frontend && npm run dev",
-    "installCommand": "npm install --prefix frontend"
-  }
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/dist",
+  "devCommand": "cd frontend && npm run dev",
+  "installCommand": "npm install --prefix frontend",
+
+  "redirects": [
+    {
+      "source": "https://mswgarage.shop/:path*",
+      "destination": "https://www.mswgarage.shop/:path*",
+      "permanent": true
+    }
+  ]
+}
