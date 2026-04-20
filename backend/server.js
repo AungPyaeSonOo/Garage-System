@@ -24,7 +24,8 @@ app.use(cors({
   origin: [
     "http://localhost:3000",
     "http://localhost:5173",
-    "https://garage-system-ehck.vercel.app"   // <-- your live frontend
+    "https://www.mswgarage.shop" ,
+    "https://mswgarage.shop"  // <-- your live frontend
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
