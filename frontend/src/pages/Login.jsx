@@ -1,27 +1,31 @@
 // pages/Login.jsx
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import api from "../utils/api";  // 👈 use your api instance instead of axios directly
+import api from "../utils/api";
 import "../styles/auth.css";
 
 function Login({ onLogin }) {
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     username: "",
     password: ""
   });
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+
+    setFormData((prev) => ({
       ...prev,
       [name]: value
     }));
+
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
         [name]: ""
       }));
@@ -47,24 +51,42 @@ function Login({ onLogin }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!validateForm()) return;
 
     setLoading(true);
+
     try {
-      // ✅ Use the api instance – baseURL is already configured
+      // ✅ IMPORTANT: MUST BE POST
       const response = await api.post("/users/login", formData);
-      
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      
-      if (onLogin) onLogin(response.data.user);
+
+      console.log("LOGIN RESPONSE:", response.data);
+
+      // ✅ SAFE ACCESS (prevents undefined crash)
+      const token = response?.data?.token;
+      const user = response?.data?.user;
+
+      if (!token) {
+        throw new Error("Token not received from server");
+      }
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user || {}));
+
+      if (onLogin) onLogin(user);
+
       navigate("/");
-      
+
     } catch (error) {
       console.error("Login error:", error);
+
       setErrors({
-        general: error.response?.data?.error || "Login failed. Please try again."
+        general:
+          error.response?.data?.error ||
+          error.message ||
+          "Login failed. Please try again."
       });
+
     } finally {
       setLoading(false);
     }
@@ -77,22 +99,16 @@ function Login({ onLogin }) {
           <div className="auth-overlay">
             <h1>MSW & Brothers</h1>
             <p>Auto Service Management System</p>
+
             <div className="auth-features">
-              <div className="feature">
-                <span>🔧</span> Service Management
-              </div>
-              <div className="feature">
-                <span>💰</span> Invoice & Payments
-              </div>
-              <div className="feature">
-                <span>📊</span> Reports & Analytics
-              </div>
-              <div className="feature">
-                <span>🚗</span> Vehicle History
-              </div>
+              <div className="feature">🔧 Service Management</div>
+              <div className="feature">💰 Invoice & Payments</div>
+              <div className="feature">📊 Reports & Analytics</div>
+              <div className="feature">🚗 Vehicle History</div>
             </div>
           </div>
         </div>
+
         <div className="auth-right">
           <div className="auth-form-container">
             <h2>Welcome Back</h2>
@@ -103,6 +119,7 @@ function Login({ onLogin }) {
             )}
 
             <form onSubmit={handleSubmit} className="auth-form">
+
               <div className="form-group">
                 <label>Username</label>
                 <input
@@ -112,12 +129,16 @@ function Login({ onLogin }) {
                   onChange={handleChange}
                   className={errors.username ? "error-input" : ""}
                   placeholder="Enter your username"
+                  autoComplete="username"
                 />
-                {errors.username && <span className="error-message">{errors.username}</span>}
+                {errors.username && (
+                  <span className="error-message">{errors.username}</span>
+                )}
               </div>
 
               <div className="form-group">
                 <label>Password</label>
+
                 <div className="password-input">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -126,7 +147,9 @@ function Login({ onLogin }) {
                     onChange={handleChange}
                     className={errors.password ? "error-input" : ""}
                     placeholder="Enter your password"
+                    autoComplete="current-password"
                   />
+
                   <button
                     type="button"
                     className="password-toggle"
@@ -135,26 +158,27 @@ function Login({ onLogin }) {
                     {showPassword ? "👁️" : "👁️‍🗨️"}
                   </button>
                 </div>
-                {errors.password && <span className="error-message">{errors.password}</span>}
+
+                {errors.password && (
+                  <span className="error-message">{errors.password}</span>
+                )}
               </div>
 
               <div className="form-options">
                 <label className="remember-me">
                   <input type="checkbox" /> Remember me
                 </label>
+
                 <Link to="/forgot-password" className="forgot-link">
                   Forgot Password?
                 </Link>
               </div>
 
-              <button 
-                type="submit" 
-                className="auth-btn"
-                disabled={loading}
-              >
-                {loading ? 'Logging in...' : 'Login'}
+              <button type="submit" className="auth-btn" disabled={loading}>
+                {loading ? "Logging in..." : "Login"}
               </button>
             </form>
+
           </div>
         </div>
       </div>
