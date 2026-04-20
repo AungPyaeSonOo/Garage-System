@@ -155,12 +155,6 @@ function Login({ onLogin }) {
                 {loading ? 'Logging in...' : 'Login'}
               </button>
             </form>
-
-            <div className="auth-footer">
-              <p>Demo Credentials:</p>
-              <p>Admin: admin / admin123</p>
-              <p>Staff: staff / staff123</p>
-            </div>
           </div>
         </div>
       </div>
