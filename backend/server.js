@@ -3,7 +3,7 @@ const cors = require("cors");
 const pool = require("./db/connection");
 const { router: userRoutes, authenticateToken } = require("./routes/userRoutes");
 
-// Import routes (same as yours)
+// Routes
 const customerRoutes = require("./routes/customerRoutes");
 const vehicleRoutes = require("./routes/vehicleRoutes");
 const serviceRoutes = require("./routes/serviceRoutes");
@@ -19,13 +19,14 @@ const invoiceCustomPartsRoutes = require("./routes/invoiceCustomParts");
 
 const app = express();
 
-// ✅ ADD YOUR VERCEL FRONTEND URL TO CORS
+app.set("trust proxy", 1);
+
+// ---------------- MIDDLEWARE ----------------
 app.use(cors({
   origin: [
     "http://localhost:3000",
     "http://localhost:5173",
-    "https://www.mswgarage.shop" ,
-    "https://mswgarage.shop"  // <-- your live frontend
+    "https://www.mswgarage.shop"
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
@@ -33,26 +34,32 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.options("*", cors());
 
-app.get('/ping', (req, res) => res.json({ message: 'Server is alive!' }));
-
+// ---------------- DB CHECK ----------------
 pool.connect((err, client, release) => {
-  if (err) console.error('❌ Error connecting to database:', err);
-  else { console.log('✅ Connected to PostgreSQL database'); release(); }
+  if (err) console.error("❌ DB Error:", err);
+  else {
+    console.log("✅ Connected to PostgreSQL");
+    release();
+  }
 });
 
+// ---------------- LOG REQUEST ----------------
 app.use((req, res, next) => {
   console.log(`📡 ${req.method} ${req.url}`);
   next();
 });
 
-// Routes
+// ---------------- ROUTES ----------------
+
+// Public routes
 app.use("/users", userRoutes);
+app.use("/problems", problemRoutes);
+
+// Protected routes (auth inside routes)
 app.use("/customers", authenticateToken, customerRoutes);
 app.use("/vehicles", authenticateToken, vehicleRoutes);
 app.use("/services", authenticateToken, serviceRoutes);
-app.use("/problems", problemRoutes);
 app.use("/employees", authenticateToken, employeeRoutes);
 app.use("/parts", authenticateToken, partRoutes);
 app.use("/invoices", authenticateToken, invoiceRoutes);
@@ -62,38 +69,31 @@ app.use("/sales-invoices", authenticateToken, salesInvoiceRoutes);
 app.use("/dashboard", authenticateToken, dashboardRoutes);
 app.use("/custom-parts", authenticateToken, invoiceCustomPartsRoutes);
 
+// ---------------- TEST ROUTES ----------------
 app.get("/", (req, res) => {
-  res.json({
-    message: "Auto Service API",
-    endpoints: {
-      users: "/users (login, register, setup)",
-      customers: "/customers",
-      vehicles: "/vehicles",
-      services: "/services",
-      employees: "/employees",
-      parts: "/parts",
-      invoices: "/invoices",
-      customParts: "/custom-parts"
-    }
+  res.json({ message: "Auto Service API is running 🚀" });
+});
+
+app.get("/ping", (req, res) => {
+  res.json({ message: "Server is alive!" });
+});
+
+// ---------------- 404 HANDLER ----------------
+app.use((req, res) => {
+  console.log(`❌ 404: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({
+    error: `Route not found: ${req.method} ${req.originalUrl}`
   });
 });
 
-// ❌ REMOVE the static frontend block – not needed for separate deployment
-// const frontendBuildPath = path.join(__dirname, "../frontend/dist");
-// app.use(express.static(frontendBuildPath));
-// app.get("*", (req, res) => { ... });
-
-// 404 handler for API only
-app.use("*", (req, res) => {
-  console.log(`❌ Route not found: ${req.method} ${req.originalUrl}`);
-  res.status(404).json({ error: `Route not found: ${req.method} ${req.originalUrl}` });
-});
-
-// Global error handler
+// ---------------- ERROR HANDLER ----------------
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error("❌ Server Error:", err);
   res.status(500).json({ error: "Something went wrong!" });
 });
 
+// ---------------- START SERVER ----------------
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
