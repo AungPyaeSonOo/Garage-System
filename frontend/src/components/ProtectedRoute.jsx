@@ -1,15 +1,23 @@
 import { Navigate } from "react-router-dom";
 
 function ProtectedRoute({ children, user, requiredRole }) {
-  if (!user) return <Navigate to="/login" replace />;
-  if (user.role === 'admin') return children;
+  // ❌ Not logged in
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // ❌ Role check (if required)
   if (requiredRole) {
-    if (Array.isArray(requiredRole)) {
-      if (!requiredRole.includes(user.role)) return <Navigate to="/" replace />;
-    } else {
-      if (user.role !== requiredRole) return <Navigate to="/" replace />;
+    const allowed = Array.isArray(requiredRole)
+      ? requiredRole.includes(user.role)
+      : user.role === requiredRole;
+
+    if (!allowed) {
+      return <Navigate to="/" replace />;
     }
   }
+
+  // ✅ allow admin/staff normally
   return children;
 }
 

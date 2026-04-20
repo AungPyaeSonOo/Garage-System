@@ -19,20 +19,19 @@ const invoiceCustomPartsRoutes = require("./routes/invoiceCustomParts");
 
 const app = express();
 
+// 🚀 IMPORTANT FOR RAILWAY
 app.set("trust proxy", 1);
 
-// ---------------- MIDDLEWARE ----------------
+// ---------------- CORS FIX ----------------
 app.use(cors({
-  origin: [
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "https://www.mswgarage.shop"
-  ],
+  origin: "*",   // 🔥 FIX for Railway + Vercel testing (we can secure later)
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
+app.options("*", cors());
+
+// ---------------- BODY PARSER ----------------
 app.use(express.json());
 
 // ---------------- DB CHECK ----------------
@@ -51,12 +50,9 @@ app.use((req, res, next) => {
 });
 
 // ---------------- ROUTES ----------------
-
-// Public routes
 app.use("/users", userRoutes);
 app.use("/problems", problemRoutes);
 
-// Protected routes (auth inside routes)
 app.use("/customers", authenticateToken, customerRoutes);
 app.use("/vehicles", authenticateToken, vehicleRoutes);
 app.use("/services", authenticateToken, serviceRoutes);
@@ -92,8 +88,9 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Something went wrong!" });
 });
 
-// ---------------- START SERVER ----------------
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+// ---------------- START SERVER (RAILWAY FIX) ----------------
+const PORT = process.env.PORT;
+
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });

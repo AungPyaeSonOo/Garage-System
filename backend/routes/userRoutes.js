@@ -92,24 +92,73 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  const { username, password } = req.body;
   try {
-    const result = await pool.query('SELECT * FROM users WHERE username = $1 AND is_active = true', [username]);
-    if (result.rows.length === 0) return res.status(401).json({ error: "Invalid username or password" });
-    const user = result.rows[0];
-    const validPassword = await bcrypt.compare(password, user.password_hash);
-    if (!validPassword) return res.status(401).json({ error: "Invalid username or password" });
-    await pool.query('UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE user_id = $1', [user.user_id]);
-    const token = jwt.sign(
-      { user_id: user.user_id, username: user.username, role: user.role, full_name: user.full_name },
-      JWT_SECRET,
-      { expiresIn: '24h' }
+    const { username, password } = req.body;
+
+    // ✅ Validate input
+    if (!username || !password) {
+      return res.status(400).json({ error: "Username and password required" });
+    }
+
+    // ✅ Get user
+    const result = await pool.query(
+      "SELECT * FROM users WHERE username = $1 AND is_active = true",
+      [username]
     );
-    delete user.password_hash;
-    res.json({ message: "Login successful", token, user });
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: "Invalid username or password" });
+    }
+
+    const user = result.rows[0];
+
+    // ❗ SAFE password check
+    if (!user.password_hash) {
+      return res.status(500).json({ error: "Password not found in DB" });
+    }
+
+    const validPassword = await bcrypt.compare(password, user.password_hash);
+
+    if (!validPassword) {
+      return res.status(401).json({ error: "Invalid username or password" });
+    }
+
+    // ✅ update last login
+    await pool.query(
+      "UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE user_id = $1",
+      [user.user_id]
+    );
+
+    // ✅ create token
+    const token = jwt.sign(
+      {
+        user_id: user.user_id,
+        username: user.username,
+        role: user.role,
+        full_name: user.full_name
+      },
+      JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
+    // ✅ SAFE user object (DO NOT mutate DB object)
+    const safeUser = {
+      user_id: user.user_id,
+      username: user.username,
+      email: user.email,
+      full_name: user.full_name,
+      role: user.role
+    };
+
+    return res.json({
+      message: "Login successful",
+      token,
+      user: safeUser
+    });
+
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ error: err.message });
+    console.error("LOGIN ERROR:", err);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 
