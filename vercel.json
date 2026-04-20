@@ -4,6 +4,13 @@
   "devCommand": "cd frontend && npm run dev",
   "installCommand": "npm install --prefix frontend",
 
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+
   "redirects": [
     {
       "source": "https://mswgarage.shop/:path*",
