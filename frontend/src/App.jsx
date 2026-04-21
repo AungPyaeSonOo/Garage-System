@@ -21,25 +21,21 @@ import EmployeePerformance from "./pages/EmployeePerformance";
 import "./styles/dashboard.css";
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // 🚀 FIX: lazy load user first (IMPORTANT)
+  const [user, setUser] = useState(() => {
+    try {
+      const token = localStorage.getItem("token");
+      const savedUser = localStorage.getItem("user");
 
-  // ✅ FIX: restore login session safely
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
+      if (!token || !savedUser) return null;
 
-    if (token && savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (err) {
-        console.log("Session error cleared");
-        localStorage.clear();
-      }
+      return JSON.parse(savedUser);
+    } catch (err) {
+      return null;
     }
+  });
 
-    setLoading(false);
-  }, []);
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = (userData) => {
     setUser(userData);
@@ -49,10 +45,6 @@ function App() {
     localStorage.clear();
     setUser(null);
   };
-
-  if (loading) {
-    return <div className="loading-spinner">Loading...</div>;
-  }
 
   return (
     <BrowserRouter>
