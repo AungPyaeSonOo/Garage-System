@@ -39,6 +39,9 @@ pool.connect((err, client, release) => {
   if (err) console.error("❌ DB Error:", err);
   else {
     console.log("✅ Connected to PostgreSQL");
+
+    const test = await client.query("SELECT NOW()");
+    console.log("DB CONNECT OK:", test.rows);
     release();
   }
 });
