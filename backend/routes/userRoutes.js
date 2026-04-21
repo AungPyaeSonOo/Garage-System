@@ -101,13 +101,10 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ error: "Username and password required" });
     }
 
-    // ✅ STEP 1: check user
     const result = await pool.query(
       "SELECT * FROM users WHERE username = $1",
       [username]
     );
-
-    console.log("📦 DB RESULT:", result.rows);
 
     if (result.rows.length === 0) {
       console.log("❌ USER NOT FOUND");
@@ -116,26 +113,22 @@ router.post("/login", async (req, res) => {
 
     const user = result.rows[0];
 
-    console.log("👤 USER FOUND:", {
-      id: user.user_id,
-      username: user.username,
-      active: user.is_active
-    });
+    // 🔥 DEBUG START HERE (IMPORTANT PLACE)
+    console.log("USER FROM DB:", user);
+    console.log("PASSWORD INPUT:", password);
+    console.log("HASH FROM DB:", user.password_hash);
 
-    // ❗ CHECK ACTIVE USER
     if (!user.is_active) {
-      console.log("❌ USER IS INACTIVE");
       return res.status(403).json({ error: "Account disabled" });
     }
 
-    // ❗ CHECK PASSWORD HASH
     if (!user.password_hash) {
-      console.log("❌ PASSWORD HASH MISSING");
       return res.status(500).json({ error: "Password not set in DB" });
     }
 
     const validPassword = await bcrypt.compare(password, user.password_hash);
 
+    console.log("COMPARE RESULT:", validPassword);
     console.log("🔐 PASSWORD MATCH:", validPassword);
 
     if (!validPassword) {
@@ -143,13 +136,11 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ error: "Invalid username or password" });
     }
 
-    // ✅ UPDATE LOGIN TIME
     await pool.query(
       "UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE user_id = $1",
       [user.user_id]
     );
 
-    // ✅ TOKEN
     const token = jwt.sign(
       {
         user_id: user.user_id,
@@ -181,7 +172,6 @@ router.post("/login", async (req, res) => {
     return res.status(500).json({ error: "Server error" });
   }
 });
-
 
 router.get("/profile", authenticateToken, async (req, res) => {
   try {
