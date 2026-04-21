@@ -1,6 +1,5 @@
 import axios from "axios";
 
-// ✅ FIX: always use Railway backend in production
 const baseURL =
   import.meta.env.VITE_API_URL ||
   "https://garage-system-production-e9c1.up.railway.app";
@@ -11,7 +10,7 @@ const api = axios.create({
   baseURL
 });
 
-// Add token automatically
+// ✅ attach token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -23,13 +22,12 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Handle auth errors
+// ✅ handle 401
 api.interceptors.response.use(
-  (response) => response,
+  (res) => res,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
+      localStorage.clear();
       window.location.href = "/login";
     }
     return Promise.reject(error);
