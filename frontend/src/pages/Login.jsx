@@ -1,5 +1,6 @@
+// pages/Login.jsx
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import api from "../utils/api";
 import "../styles/auth.css";
 
@@ -16,20 +17,36 @@ function Login({ onLogin }) {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
 
-    if (errors[e.target.name]) {
-      setErrors({ ...errors, [e.target.name]: "" });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: ""
+      }));
     }
   };
 
   const validateForm = () => {
-    const err = {};
-    if (!formData.username) err.username = "Username required";
-    if (!formData.password) err.password = "Password required";
+    const newErrors = {};
 
-    setErrors(err);
-    return Object.keys(err).length === 0;
+    if (!formData.username.trim()) {
+      newErrors.username = "Username is required";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
@@ -40,34 +57,34 @@ function Login({ onLogin }) {
     setLoading(true);
 
     try {
-      const res = await api.post("/users/login", formData);
+      // ✅ IMPORTANT: MUST BE POST
+      const response = await api.post("/users/login", formData);
 
-      console.log("LOGIN RESPONSE:", res.data);
+      console.log("LOGIN RESPONSE:", response.data);
 
-      const token = res.data?.token;
-      const user = res.data?.user || res.data?.data?.user;
+      // ✅ SAFE ACCESS (prevents undefined crash)
+      const token = response?.data?.token;
+      const user = response?.data?.user;
 
-      if (!token || !user) {
-        throw new Error("Invalid login response");
+      if (!token) {
+        throw new Error("Token not received from server");
       }
 
-      // save session
       localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("user", JSON.stringify(user || {}));
 
-      onLogin(user);
+      if (onLogin) onLogin(user);
 
-      // 🔥 FIX: force reload for stable auth state
-      window.location.href = "/";
+      navigate("/");
 
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.error("Login error:", error);
 
       setErrors({
         general:
-          err.response?.data?.error ||
-          err.message ||
-          "Login failed"
+          error.response?.data?.error ||
+          error.message ||
+          "Login failed. Please try again."
       });
 
     } finally {
@@ -77,36 +94,94 @@ function Login({ onLogin }) {
 
   return (
     <div className="auth-page">
-      <form onSubmit={handleSubmit}>
+      <div className="auth-container">
+        <div className="auth-left">
+          <div className="auth-overlay">
+            <h1>MSW & Brothers</h1>
+            <p>Auto Service Management System</p>
 
-        <h2>Login</h2>
+            <div className="auth-features">
+              <div className="feature">🔧 Service Management</div>
+              <div className="feature">💰 Invoice & Payments</div>
+              <div className="feature">📊 Reports & Analytics</div>
+              <div className="feature">🚗 Vehicle History</div>
+            </div>
+          </div>
+        </div>
 
-        {errors.general && <p>{errors.general}</p>}
+        <div className="auth-right">
+          <div className="auth-form-container">
+            <h2>Welcome Back</h2>
+            <p className="auth-subtitle">Please login to your account</p>
 
-        <input
-          name="username"
-          placeholder="Username"
-          onChange={handleChange}
-        />
-        {errors.username && <p>{errors.username}</p>}
+            {errors.general && (
+              <div className="auth-error">{errors.general}</div>
+            )}
 
-        <input
-          type={showPassword ? "text" : "password"}
-          name="password"
-          placeholder="Password"
-          onChange={handleChange}
-        />
-        {errors.password && <p>{errors.password}</p>}
+            <form onSubmit={handleSubmit} className="auth-form">
 
-        <button type="button" onClick={() => setShowPassword(!showPassword)}>
-          Show/Hide
-        </button>
+              <div className="form-group">
+                <label>Username</label>
+                <input
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  className={errors.username ? "error-input" : ""}
+                  placeholder="Enter your username"
+                  autoComplete="username"
+                />
+                {errors.username && (
+                  <span className="error-message">{errors.username}</span>
+                )}
+              </div>
 
-        <button disabled={loading}>
-          {loading ? "Loading..." : "Login"}
-        </button>
+              <div className="form-group">
+                <label>Password</label>
 
-      </form>
+                <div className="password-input">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className={errors.password ? "error-input" : ""}
+                    placeholder="Enter your password"
+                    autoComplete="current-password"
+                  />
+
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? "👁️" : "👁️‍🗨️"}
+                  </button>
+                </div>
+
+                {errors.password && (
+                  <span className="error-message">{errors.password}</span>
+                )}
+              </div>
+
+              <div className="form-options">
+                <label className="remember-me">
+                  <input type="checkbox" /> Remember me
+                </label>
+
+                <Link to="/forgot-password" className="forgot-link">
+                  Forgot Password?
+                </Link>
+              </div>
+
+              <button type="submit" className="auth-btn" disabled={loading}>
+                {loading ? "Logging in..." : "Login"}
+              </button>
+            </form>
+
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

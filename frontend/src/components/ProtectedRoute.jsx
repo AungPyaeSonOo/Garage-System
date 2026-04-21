@@ -1,12 +1,12 @@
 import { Navigate } from "react-router-dom";
 
 function ProtectedRoute({ children, user, requiredRole }) {
-  const token = localStorage.getItem("token");
-
-  if (!token || !user) {
+  // ❌ Not logged in
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 
+  // ❌ Role check (if required)
   if (requiredRole) {
     const allowed = Array.isArray(requiredRole)
       ? requiredRole.includes(user.role)
@@ -17,6 +17,7 @@ function ProtectedRoute({ children, user, requiredRole }) {
     }
   }
 
+  // ✅ allow admin/staff normally
   return children;
 }
 
