@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
 import "../styles/auth.css";
 
@@ -16,76 +16,60 @@ function Login({ onLogin }) {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value
-    }));
-
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: ""
-      }));
+    if (errors[e.target.name]) {
+      setErrors({ ...errors, [e.target.name]: "" });
     }
   };
 
   const validateForm = () => {
-    const newErrors = {};
+    const err = {};
+    if (!formData.username) err.username = "Username required";
+    if (!formData.password) err.password = "Password required";
 
-    if (!formData.username.trim()) {
-      newErrors.username = "Username is required";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrors(err);
+    return Object.keys(err).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!validateForm()) return;
-  
+
     setLoading(true);
-  
+
     try {
-      const response = await api.post("/users/login", formData);
-  
-      console.log("LOGIN RESPONSE:", response.data);
-  
-      const token = response?.data?.token;
-      const user = response?.data?.user;
-  
-      // ❗ FIX: backend might return user inside data.user OR data.data.user
-      const finalUser = user || response?.data?.data?.user;
-  
-      if (!token) {
-        throw new Error("Token not received");
+      const res = await api.post("/users/login", formData);
+
+      console.log("LOGIN RESPONSE:", res.data);
+
+      const token = res.data?.token;
+      const user = res.data?.user || res.data?.data?.user;
+
+      if (!token || !user) {
+        throw new Error("Invalid login response");
       }
-  
+
+      // save session
       localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(finalUser));
-  
-      onLogin(finalUser);
-  
-      // ✅ FORCE REFRESH SAFE ROUTE LOAD
+      localStorage.setItem("user", JSON.stringify(user));
+
+      onLogin(user);
+
+      // 🔥 FIX: force reload for stable auth state
       window.location.href = "/";
-  
-    } catch (error) {
-      console.log("LOGIN ERROR:", error);
-  
+
+    } catch (err) {
+      console.log(err);
+
       setErrors({
         general:
-          error.response?.data?.error ||
-          error.message ||
+          err.response?.data?.error ||
+          err.message ||
           "Login failed"
       });
-  
+
     } finally {
       setLoading(false);
     }
@@ -93,57 +77,36 @@ function Login({ onLogin }) {
 
   return (
     <div className="auth-page">
-      <div className="auth-container">
+      <form onSubmit={handleSubmit}>
 
-        <div className="auth-left">
-          <div className="auth-overlay">
-            <h1>MSW & Brothers</h1>
-            <p>Auto Service System</p>
-          </div>
-        </div>
+        <h2>Login</h2>
 
-        <div className="auth-right">
-          <div className="auth-form-container">
+        {errors.general && <p>{errors.general}</p>}
 
-            <h2>Login</h2>
+        <input
+          name="username"
+          placeholder="Username"
+          onChange={handleChange}
+        />
+        {errors.username && <p>{errors.username}</p>}
 
-            {errors.general && (
-              <div className="auth-error">{errors.general}</div>
-            )}
+        <input
+          type={showPassword ? "text" : "password"}
+          name="password"
+          placeholder="Password"
+          onChange={handleChange}
+        />
+        {errors.password && <p>{errors.password}</p>}
 
-            <form onSubmit={handleSubmit}>
+        <button type="button" onClick={() => setShowPassword(!showPassword)}>
+          Show/Hide
+        </button>
 
-              <input
-                name="username"
-                placeholder="Username"
-                value={formData.username}
-                onChange={handleChange}
-              />
-              {errors.username && <p>{errors.username}</p>}
+        <button disabled={loading}>
+          {loading ? "Loading..." : "Login"}
+        </button>
 
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-              />
-              {errors.password && <p>{errors.password}</p>}
-
-              <button type="button" onClick={() => setShowPassword(!showPassword)}>
-                Toggle
-              </button>
-
-              <button disabled={loading}>
-                {loading ? "Logging in..." : "Login"}
-              </button>
-
-            </form>
-
-          </div>
-        </div>
-
-      </div>
+      </form>
     </div>
   );
 }

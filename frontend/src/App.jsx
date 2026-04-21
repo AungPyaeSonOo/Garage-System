@@ -24,7 +24,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ RESTORE LOGIN SESSION (FIXED)
+  // ✅ FIX: restore login session safely
   useEffect(() => {
     const token = localStorage.getItem("token");
     const savedUser = localStorage.getItem("user");
@@ -33,7 +33,7 @@ function App() {
       try {
         setUser(JSON.parse(savedUser));
       } catch (err) {
-        console.log("Invalid user data, clearing...");
+        console.log("Session error cleared");
         localStorage.clear();
       }
     }
