@@ -7,15 +7,7 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
-
-  "redirects": [
-    {
-      "source": "https://mswgarage.shop/:path*",
-      "destination": "https://www.mswgarage.shop/:path*",
-      "permanent": true
+      "destination": "/"
     }
   ]
 }
