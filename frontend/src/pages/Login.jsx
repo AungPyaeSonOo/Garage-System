@@ -40,8 +40,6 @@ function Login({ onLogin }) {
 
     if (!formData.password) {
       newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
     }
 
     setErrors(newErrors);
@@ -61,19 +59,22 @@ function Login({ onLogin }) {
       const token = response?.data?.token;
       const user = response?.data?.user;
 
-      if (!token) throw new Error("Token not received");
+      if (!token || !user) {
+        throw new Error("Invalid login response");
+      }
 
-      // ✅ save auth
+      // save session
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
-      // sync app
       if (onLogin) onLogin(user);
-      window.dispatchEvent(new Event("storage"));
 
-      navigate("/");
+      // IMPORTANT FIX
+      navigate("/", { replace: true });
 
     } catch (error) {
+      console.error("Login error:", error);
+
       setErrors({
         general:
           error.response?.data?.error ||
@@ -90,10 +91,17 @@ function Login({ onLogin }) {
     <div className="auth-page">
       <div className="auth-container">
 
+        <div className="auth-left">
+          <div className="auth-overlay">
+            <h1>MSW & Brothers</h1>
+            <p>Auto Service System</p>
+          </div>
+        </div>
+
         <div className="auth-right">
           <div className="auth-form-container">
 
-            <h2>Welcome Back</h2>
+            <h2>Login</h2>
 
             {errors.general && (
               <div className="auth-error">{errors.general}</div>
@@ -103,22 +111,26 @@ function Login({ onLogin }) {
 
               <input
                 name="username"
+                placeholder="Username"
                 value={formData.username}
                 onChange={handleChange}
-                placeholder="Username"
               />
               {errors.username && <p>{errors.username}</p>}
 
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
+                placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="Password"
               />
               {errors.password && <p>{errors.password}</p>}
 
-              <button type="submit" disabled={loading}>
+              <button type="button" onClick={() => setShowPassword(!showPassword)}>
+                Toggle
+              </button>
+
+              <button disabled={loading}>
                 {loading ? "Logging in..." : "Login"}
               </button>
 

@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+
 import Layout from "./layout/Layout";
 import Dashboard from "./pages/Dashboard";
 import Customers from "./pages/Customers";
@@ -16,44 +17,34 @@ import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Problems from "./pages/Problems";
 import EmployeePerformance from "./pages/EmployeePerformance";
+
 import "./styles/dashboard.css";
 
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Load auth on start
+  // ✅ FIX: restore session safely
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
+    try {
+      const savedUser = localStorage.getItem("user");
+      const token = localStorage.getItem("token");
 
-    if (token && savedUser) {
-      setUser(JSON.parse(savedUser));
-    } else {
-      setUser(null);
+      if (savedUser && token) {
+        setUser(JSON.parse(savedUser));
+      }
+    } catch (err) {
+      console.error("User restore error:", err);
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
     }
 
     setLoading(false);
   }, []);
 
-  // ✅ Sync between tabs / refresh safety
-  useEffect(() => {
-    const syncAuth = () => {
-      const token = localStorage.getItem("token");
-      const savedUser = localStorage.getItem("user");
-
-      if (!token || !savedUser) {
-        setUser(null);
-      } else {
-        setUser(JSON.parse(savedUser));
-      }
-    };
-
-    window.addEventListener("storage", syncAuth);
-    return () => window.removeEventListener("storage", syncAuth);
-  }, []);
-
-  const handleLogin = (userData) => setUser(userData);
+  const handleLogin = (userData) => {
+    setUser(userData);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -61,15 +52,23 @@ function App() {
     setUser(null);
   };
 
-  if (loading) return <div className="loading-spinner">Loading...</div>;
+  if (loading) {
+    return <div className="loading-spinner">Loading...</div>;
+  }
 
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public */}
-        <Route path="/login" element={<Login onLogin={handleLogin} />} />
 
-        {/* Register (admin only) */}
+        {/* LOGIN */}
+        <Route
+          path="/login"
+          element={
+            user ? <Navigate to="/" replace /> : <Login onLogin={handleLogin} />
+          }
+        />
+
+        {/* REGISTER */}
         <Route
           path="/register"
           element={
@@ -79,7 +78,7 @@ function App() {
           }
         />
 
-        {/* Protected Layout */}
+        {/* MAIN APP */}
         <Route
           path="/"
           element={
@@ -103,7 +102,11 @@ function App() {
         </Route>
 
         {/* fallback */}
-        <Route path="*" element={<Navigate to={user ? "/" : "/login"} replace />} />
+        <Route
+          path="*"
+          element={<Navigate to={user ? "/" : "/login"} replace />}
+        />
+
       </Routes>
     </BrowserRouter>
   );

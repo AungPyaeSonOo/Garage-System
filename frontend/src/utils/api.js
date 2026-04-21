@@ -1,18 +1,20 @@
-import axios from 'axios';
+import axios from "axios";
 
-// Use environment variable – empty in production (same origin), localhost in dev
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// ✅ FIX: always use Railway backend in production
+const baseURL =
+  import.meta.env.VITE_API_URL ||
+  "https://garage-system-production-e9c1.up.railway.app";
 
 console.log("API BASE URL:", baseURL);
 
 const api = axios.create({
-  baseURL: baseURL
+  baseURL
 });
 
-// Add token to every request
+// Add token automatically
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -21,15 +23,14 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Handle response errors
+// Handle auth errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }
