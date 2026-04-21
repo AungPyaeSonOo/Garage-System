@@ -45,16 +45,23 @@ app.use(express.json());
 // =====================
 // DATABASE CHECK (SAFE)
 // =====================
-(async () => {
-  try {
-    const client = await pool.connect();
-    const result = await client.query("SELECT NOW()");
-    console.log("✅ Connected to PostgreSQL:", result.rows[0]);
-    client.release();
-  } catch (err) {
+// =====================
+// DATABASE CHECK (FIXED)
+// =====================
+pool.connect()
+  .then(async (client) => {
+    try {
+      const result = await client.query("SELECT NOW()");
+      console.log("✅ Connected to PostgreSQL:", result.rows[0]);
+    } catch (err) {
+      console.error("❌ Query Error:", err.message);
+    } finally {
+      client.release();
+    }
+  })
+  .catch((err) => {
     console.error("❌ Database connection failed:", err.message);
-  }
-})();
+  });
 
 // =====================
 // REQUEST LOGGER

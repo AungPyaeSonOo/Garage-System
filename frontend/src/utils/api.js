@@ -1,57 +1,39 @@
 import axios from "axios";
 
-// ✅ safer config (remove trailing slash issues)
-const baseURL =
-  (import.meta.env.VITE_API_URL ||
-  "https://garage-system-production-e9c1.up.railway.app").replace(/\/$/, "");
+const baseURL = import.meta.env.VITE_API_URL;
 
-console.log("API BASE URL:", baseURL);
+console.log("🌐 API URL:", baseURL);
 
 const api = axios.create({
   baseURL,
-  timeout: 15000, // ✅ prevent hanging requests
-  headers: {
-    "Content-Type": "application/json"
-  }
+  timeout: 20000
 });
 
-// =====================
-// ✅ REQUEST INTERCEPTOR
-// =====================
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+  console.log("📡 REQUEST:", config.url);
 
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
 
-// =====================
-// ✅ RESPONSE HANDLER
-// =====================
+  return config;
+});
+
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    console.log("❌ API ERROR:", {
-      message: error.message,
-      status: error.response?.status,
-      data: error.response?.data,
-      url: error.config?.url
+  (res) => {
+    console.log("📥 RESPONSE:", res.data);
+    return res;
+  },
+  (err) => {
+    console.log("❌ API ERROR FULL:", {
+      message: err.message,
+      response: err.response?.data,
+      status: err.response?.status
     });
 
-    // only logout on real auth failure
-    if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "/login";
-    }
-
-    return Promise.reject(error);
+    return Promise.reject(err);
   }
 );
 

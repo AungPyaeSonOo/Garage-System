@@ -12,58 +12,47 @@ function Login({ onLogin }) {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.username) newErrors.username = "Username required";
-    if (!formData.password) newErrors.password = "Password required";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) return;
-
+    setErrors({});
     setLoading(true);
+
+    console.log("📤 LOGIN REQUEST:", formData);
 
     try {
       const res = await api.post("/users/login", formData);
 
-      console.log("LOGIN SUCCESS:", res.data);
+      console.log("📥 LOGIN RESPONSE:", res.data);
 
-      const token = res.data.token;
-      const user = res.data.user;
+      const token = res.data?.token;
+      const user = res.data?.user;
 
       if (!token || !user) {
-        throw new Error("Invalid server response");
+        console.error("❌ INVALID RESPONSE:", res.data);
+        setErrors({ general: "Server returned invalid login data" });
+        return;
       }
 
-      // ✅ SAVE
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
-      // ✅ UPDATE STATE
       onLogin(user);
 
-      // ✅ HARD REDIRECT (VERY IMPORTANT)
+      console.log("🚀 GO DASHBOARD");
+
       window.location.href = "/";
 
     } catch (err) {
-      console.log("LOGIN ERROR:", err);
+      console.log("❌ LOGIN ERROR FULL:", err);
 
       setErrors({
         general:
           err.response?.data?.error ||
-          "Invalid username or password"
+          err.message ||
+          "Network error (check backend)"
       });
     }
 
@@ -72,51 +61,30 @@ function Login({ onLogin }) {
 
   return (
     <div className="auth-page">
-      <div className="auth-container">
+      <h2>Login</h2>
 
-        <div className="auth-left">
-          <div className="auth-overlay">
-            <h1>MSW & Brothers</h1>
-            <p>Auto Service System</p>
-          </div>
-        </div>
+      {errors.general && (
+        <div style={{ color: "red" }}>{errors.general}</div>
+      )}
 
-        <div className="auth-right">
-          <div className="auth-form-container">
+      <form onSubmit={handleSubmit}>
+        <input
+          name="username"
+          placeholder="Username"
+          onChange={handleChange}
+        />
 
-            <h2>Login</h2>
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          onChange={handleChange}
+        />
 
-            {errors.general && <div className="auth-error">{errors.general}</div>}
-
-            <form onSubmit={handleSubmit}>
-
-              <input
-                name="username"
-                placeholder="Username"
-                value={formData.username}
-                onChange={handleChange}
-              />
-              {errors.username && <p>{errors.username}</p>}
-
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-              />
-              {errors.password && <p>{errors.password}</p>}
-
-              <button disabled={loading}>
-                {loading ? "Logging..." : "Login"}
-              </button>
-
-            </form>
-
-          </div>
-        </div>
-
-      </div>
+        <button disabled={loading}>
+          {loading ? "Logging..." : "Login"}
+        </button>
+      </form>
     </div>
   );
 }

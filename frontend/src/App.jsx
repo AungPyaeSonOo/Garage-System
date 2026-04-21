@@ -21,30 +21,34 @@ import EmployeePerformance from "./pages/EmployeePerformance";
 import "./styles/dashboard.css";
 
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(undefined); // ✅ IMPORTANT FIX
   const [loading, setLoading] = useState(true);
 
-  // ✅ FIX: restore session correctly
+  // ✅ RESTORE SESSION (SAFE)
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
+    try {
+      const token = localStorage.getItem("token");
+      const savedUser = localStorage.getItem("user");
 
-    if (token && savedUser) {
-      try {
+      console.log("🔐 RESTORE SESSION:", { token, savedUser });
+
+      if (token && savedUser) {
         const parsed = JSON.parse(savedUser);
-
-        if (parsed && parsed.username) {
-          setUser(parsed);
-        }
-      } catch {
-        localStorage.clear();
+        setUser(parsed);
+      } else {
+        setUser(null);
       }
+    } catch (err) {
+      console.error("❌ SESSION ERROR:", err);
+      localStorage.clear();
+      setUser(null);
     }
 
     setLoading(false);
   }, []);
 
   const handleLogin = (userData) => {
+    console.log("✅ LOGIN STATE SET:", userData);
     setUser(userData);
   };
 
@@ -53,15 +57,13 @@ function App() {
     setUser(null);
   };
 
-  if (loading) {
-    return <div className="loading-spinner">Loading...</div>;
-  }
+  if (loading) return <div className="loading-spinner">Loading...</div>;
 
   return (
     <BrowserRouter>
       <Routes>
 
-        {/* ✅ LOGIN */}
+        {/* LOGIN */}
         <Route
           path="/login"
           element={
@@ -79,7 +81,7 @@ function App() {
           }
         />
 
-        {/* MAIN */}
+        {/* MAIN APP */}
         <Route
           path="/"
           element={
@@ -102,7 +104,7 @@ function App() {
           <Route path="vehicles/:vehicleId/history" element={<VehicleHistory />} />
         </Route>
 
-        {/* fallback */}
+        {/* FALLBACK */}
         <Route
           path="*"
           element={<Navigate to={user ? "/" : "/login"} replace />}
