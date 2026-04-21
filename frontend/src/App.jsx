@@ -24,19 +24,18 @@ function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ FIX: restore session safely
+  // ✅ RESTORE LOGIN SESSION (FIXED)
   useEffect(() => {
-    try {
-      const savedUser = localStorage.getItem("user");
-      const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
+    const savedUser = localStorage.getItem("user");
 
-      if (savedUser && token) {
+    if (token && savedUser) {
+      try {
         setUser(JSON.parse(savedUser));
+      } catch (err) {
+        console.log("Invalid user data, clearing...");
+        localStorage.clear();
       }
-    } catch (err) {
-      console.error("User restore error:", err);
-      localStorage.removeItem("user");
-      localStorage.removeItem("token");
     }
 
     setLoading(false);
@@ -47,8 +46,7 @@ function App() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    localStorage.clear();
     setUser(null);
   };
 

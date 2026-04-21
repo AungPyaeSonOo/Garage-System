@@ -48,40 +48,44 @@ function Login({ onLogin }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!validateForm()) return;
-
+  
     setLoading(true);
-
+  
     try {
       const response = await api.post("/users/login", formData);
-
+  
+      console.log("LOGIN RESPONSE:", response.data);
+  
       const token = response?.data?.token;
       const user = response?.data?.user;
-
-      if (!token || !user) {
-        throw new Error("Invalid login response");
+  
+      // ❗ FIX: backend might return user inside data.user OR data.data.user
+      const finalUser = user || response?.data?.data?.user;
+  
+      if (!token) {
+        throw new Error("Token not received");
       }
-
-      // save session
+  
       localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-
-      if (onLogin) onLogin(user);
-
-      // IMPORTANT FIX
-      navigate("/", { replace: true });
-
+      localStorage.setItem("user", JSON.stringify(finalUser));
+  
+      onLogin(finalUser);
+  
+      // ✅ FORCE REFRESH SAFE ROUTE LOAD
+      window.location.href = "/";
+  
     } catch (error) {
-      console.error("Login error:", error);
-
+      console.log("LOGIN ERROR:", error);
+  
       setErrors({
         general:
           error.response?.data?.error ||
           error.message ||
           "Login failed"
       });
-
+  
     } finally {
       setLoading(false);
     }
