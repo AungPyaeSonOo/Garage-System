@@ -7,11 +7,9 @@ const api = axios.create({
   timeout: 20000
 });
 
-// ✅ REQUEST INTERCEPTOR
+// ================= REQUEST =================
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("accessToken");
-
-  console.log("📡 REQUEST:", config.url);
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -20,45 +18,48 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// ✅ RESPONSE INTERCEPTOR (AUTO REFRESH TOKEN)
+// ================= RESPONSE =================
 api.interceptors.response.use(
-  (res) => {
-    console.log("📥 RESPONSE:", res.data);
-    return res;
-  },
+  (res) => res,
   async (err) => {
     const originalRequest = err.config;
     const status = err.response?.status;
 
-    console.log("❌ API ERROR:", status);
+    // prevent infinite loop
+    if (originalRequest._retry) {
+      return Promise.reject(err);
+    }
 
-    // 🔥 TOKEN EXPIRED → TRY REFRESH
-    if ((status === 401 || status === 403) && !originalRequest._retry) {
+    // TOKEN EXPIRED
+    if (status === 401 || status === 403) {
       originalRequest._retry = true;
 
       try {
-        console.log("🔄 Trying refresh token...");
-
         const refreshToken = localStorage.getItem("refreshToken");
 
-        const res = await axios.post(
-          `${baseURL}/users/refresh`,
-          { refreshToken }
-        );
+        if (!refreshToken) {
+          throw new Error("No refresh token");
+        }
 
-        const newAccessToken = res.data.accessToken;
+        const res = await axios.post(`${baseURL}/users/refresh`, {
+          refreshToken
+        });
 
-        console.log("✅ New Access Token:", newAccessToken);
+        const newAccessToken = res.data?.accessToken;
 
-        // Save new token
+        if (!newAccessToken) {
+          throw new Error("No new token");
+        }
+
+        // save new token
         localStorage.setItem("accessToken", newAccessToken);
 
-        // Retry original request
+        // retry request
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
 
       } catch (refreshError) {
-        console.log("🔴 Refresh failed → logout");
+        console.log("🔴 Refresh failed");
 
         localStorage.clear();
         window.location.href = "/login";

@@ -20,46 +20,33 @@ function Login({ onLogin }) {
     setErrors({});
     setLoading(true);
 
-    console.log("📤 LOGIN REQUEST:", formData);
-
     try {
       const res = await api.post("/users/login", formData);
 
-      console.log("📥 LOGIN RESPONSE:", res.data);
-
-      // ✅ NEW (IMPORTANT CHANGE)
       const accessToken = res.data?.accessToken;
       const refreshToken = res.data?.refreshToken;
       const user = res.data?.user;
 
+      // ✅ FIXED VALIDATION
       if (!accessToken || !refreshToken || !user) {
-        console.error("❌ INVALID RESPONSE:", res.data);
-        setErrors({ general: "Server returned invalid login data" });
+        setErrors({ general: "Invalid login response from server" });
         return;
       }
 
-      // ✅ SAVE TOKENS CORRECTLY
+      // ✅ SAVE SESSION
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("user", JSON.stringify(user));
 
-      console.log("✅ TOKENS SAVED");
-
-      // optional callback
       onLogin(user);
-
-      console.log("🚀 GO DASHBOARD");
 
       window.location.href = "/";
 
     } catch (err) {
-      console.log("❌ LOGIN ERROR FULL:", err);
-
       setErrors({
         general:
           err.response?.data?.error ||
-          err.message ||
-          "Network error (check backend)"
+          "Login failed"
       });
     }
 
