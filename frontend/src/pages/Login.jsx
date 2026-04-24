@@ -27,18 +27,25 @@ function Login({ onLogin }) {
 
       console.log("📥 LOGIN RESPONSE:", res.data);
 
-      const token = res.data?.token;
+      // ✅ NEW (IMPORTANT CHANGE)
+      const accessToken = res.data?.accessToken;
+      const refreshToken = res.data?.refreshToken;
       const user = res.data?.user;
 
-      if (!token || !user) {
+      if (!accessToken || !refreshToken || !user) {
         console.error("❌ INVALID RESPONSE:", res.data);
         setErrors({ general: "Server returned invalid login data" });
         return;
       }
 
-      localStorage.setItem("token", token);
+      // ✅ SAVE TOKENS CORRECTLY
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("user", JSON.stringify(user));
 
+      console.log("✅ TOKENS SAVED");
+
+      // optional callback
       onLogin(user);
 
       console.log("🚀 GO DASHBOARD");
