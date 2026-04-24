@@ -9,6 +9,7 @@ const api = axios.create({
   timeout: 20000
 });
 
+// ✅ REQUEST INTERCEPTOR
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 
@@ -21,17 +22,31 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// ✅ RESPONSE INTERCEPTOR (🔥 FIX HERE)
 api.interceptors.response.use(
   (res) => {
     console.log("📥 RESPONSE:", res.data);
     return res;
   },
   (err) => {
+    const status = err.response?.status;
+
     console.log("❌ API ERROR FULL:", {
       message: err.message,
       response: err.response?.data,
-      status: err.response?.status
+      status
     });
+
+    // 🚨 AUTO REDIRECT WHEN TOKEN EXPIRED
+    if (status === 401 || status === 403) {
+      console.log("🔴 Token expired → redirect login");
+
+      // clear token
+      localStorage.removeItem("token");
+
+      // redirect to login
+      window.location.href = "/login";
+    }
 
     return Promise.reject(err);
   }

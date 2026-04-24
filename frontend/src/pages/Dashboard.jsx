@@ -1,4 +1,3 @@
-// pages/Dashboard.jsx
 import { useEffect, useState } from "react";
 import api from "../utils/api";
 import DashboardCards from "../components/DashboardCards";
@@ -6,6 +5,7 @@ import DashboardCharts from "../components/DashboardCharts";
 
 function Dashboard() {
   const [dateRange, setDateRange] = useState("week");
+
   const [stats, setStats] = useState({
     totalCustomers: 0,
     totalVehicles: 0,
@@ -14,7 +14,7 @@ function Dashboard() {
     totalRevenue: 0,
     pendingInvoices: 0
   });
-  
+
   const [chartData, setChartData] = useState({
     revenueData: [],
     serviceStatusData: [],
@@ -28,13 +28,22 @@ function Dashboard() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // 🚨 CHECK TOKEN FIRST
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      console.log("🚫 No token → redirect login");
+      window.location.href = "/login";
+      return;
+    }
+
     loadDashboardData();
   }, [dateRange]);
 
   const getDateRange = () => {
     const now = new Date();
     let start = new Date();
-    
+
     if (dateRange === "day") {
       start.setDate(now.getDate() - 1);
     } else if (dateRange === "week") {
@@ -42,7 +51,7 @@ function Dashboard() {
     } else if (dateRange === "month") {
       start.setMonth(now.getMonth() - 1);
     }
-    
+
     return {
       start: start.toISOString().split('T')[0],
       end: now.toISOString().split('T')[0]
@@ -52,11 +61,16 @@ function Dashboard() {
   const loadDashboardData = async () => {
     setLoading(true);
     setError(null);
+
     try {
       const range = getDateRange();
-      const response = await api.get(`/dashboard?start=${range.start}&end=${range.end}`);
+
+      const response = await api.get(
+        `/dashboard?start=${range.start}&end=${range.end}`
+      );
+
       const data = response.data;
-      
+
       setStats(data.stats);
       setChartData({
         revenueData: data.revenueData,
@@ -66,8 +80,10 @@ function Dashboard() {
         recentActivities: data.recentActivities,
         lowStockItems: data.lowStockItems
       });
+
     } catch (err) {
       console.error("Dashboard fetch error:", err);
+
       setError("Failed to load dashboard data. Please try again.");
     } finally {
       setLoading(false);
@@ -101,20 +117,23 @@ function Dashboard() {
     <>
       <div className="dashboard-header">
         <h2>📊 Dashboard</h2>
+
         <div className="date-range-selector">
-          <button 
+          <button
             className={`range-btn ${dateRange === 'day' ? 'active' : ''}`}
             onClick={() => setDateRange('day')}
           >
             Today
           </button>
-          <button 
+
+          <button
             className={`range-btn ${dateRange === 'week' ? 'active' : ''}`}
             onClick={() => setDateRange('week')}
           >
             This Week
           </button>
-          <button 
+
+          <button
             className={`range-btn ${dateRange === 'month' ? 'active' : ''}`}
             onClick={() => setDateRange('month')}
           >
@@ -124,8 +143,8 @@ function Dashboard() {
       </div>
 
       <DashboardCards stats={stats} />
-      
-      <DashboardCharts 
+
+      <DashboardCharts
         chartData={chartData}
         loading={loading}
         error={error}
