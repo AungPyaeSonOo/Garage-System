@@ -61,7 +61,32 @@ function Login({ onLogin }) {
   
         {/* LEFT SIDE */}
         <div className="auth-left">
-          <h1>Welcome</h1>
+          <div className="auth-overlay">
+  
+            <h1>MSW & Brothers</h1>
+            <p>Auto Service Management System</p>
+  
+            <div className="auth-features">
+  
+              <div className="feature">
+                <span>🔧</span> Service Management
+              </div>
+  
+              <div className="feature">
+                <span>💰</span> Invoice & Payments
+              </div>
+  
+              <div className="feature">
+                <span>📊</span> Reports & Analytics
+              </div>
+  
+              <div className="feature">
+                <span>🚗</span> Vehicle History
+              </div>
+  
+            </div>
+  
+          </div>
         </div>
   
         {/* RIGHT SIDE */}
@@ -69,7 +94,8 @@ function Login({ onLogin }) {
   
           <div className="auth-form-container">
   
-            <h2>Login</h2>
+            <h2>Welcome Back</h2>
+            <p className="auth-subtitle">Please login to your account</p>
   
             {errors.general && (
               <div className="auth-error">{errors.general}</div>
@@ -77,19 +103,44 @@ function Login({ onLogin }) {
   
             <form onSubmit={handleSubmit} className="auth-form">
   
-              <input
-                name="username"
-                placeholder="Username"
-                onChange={handleChange}
-              />
+              {/* USERNAME */}
+              <div className="form-group">
+                <label>Username</label>
+                <input
+                  name="username"
+                  placeholder="Enter username"
+                  onChange={handleChange}
+                />
+              </div>
   
-              <input
-                name="password"
-                type="password"
-                placeholder="Password"
-                onChange={handleChange}
-              />
+              {/* PASSWORD */}
+              <div className="form-group">
+                <label>Password</label>
+                <div className="password-input">
+                  <input
+                    name="password"
+                    type="password"
+                    placeholder="Enter password"
+                    onChange={handleChange}
+                  />
+                  <button type="button" className="password-toggle">
+                    👁️
+                  </button>
+                </div>
+              </div>
   
+              {/* OPTIONS */}
+              <div className="form-options">
+                <label>
+                  <input type="checkbox" /> Remember me
+                </label>
+  
+                <a href="#" className="forgot-link">
+                  Forgot Password?
+                </a>
+              </div>
+  
+              {/* BUTTON */}
               <button className="auth-btn" disabled={loading}>
                 {loading ? "Logging..." : "Login"}
               </button>
