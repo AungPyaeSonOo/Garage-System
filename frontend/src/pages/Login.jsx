@@ -53,34 +53,53 @@ function Login({ onLogin }) {
     setLoading(false);
   };
 
+  
   return (
     <div className="auth-page">
-      <h2>Login</h2>
-
-      {errors.general && (
-        <div style={{ color: "red" }}>{errors.general}</div>
-      )}
-
-      <form onSubmit={handleSubmit}>
-        <input
-          name="username"
-          placeholder="Username"
-          onChange={handleChange}
-          autoComplete="username"
-        />
-
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          autoComplete="current-password"
-          onChange={handleChange}
-        />
-
-        <button disabled={loading}>
-          {loading ? "Logging..." : "Login"}
-        </button>
-      </form>
+  
+      <div className="auth-container">
+  
+        {/* LEFT SIDE */}
+        <div className="auth-left">
+          <h1>Welcome</h1>
+        </div>
+  
+        {/* RIGHT SIDE */}
+        <div className="auth-right">
+  
+          <div className="auth-form-container">
+  
+            <h2>Login</h2>
+  
+            {errors.general && (
+              <div className="auth-error">{errors.general}</div>
+            )}
+  
+            <form onSubmit={handleSubmit} className="auth-form">
+  
+              <input
+                name="username"
+                placeholder="Username"
+                onChange={handleChange}
+              />
+  
+              <input
+                name="password"
+                type="password"
+                placeholder="Password"
+                onChange={handleChange}
+              />
+  
+              <button className="auth-btn" disabled={loading}>
+                {loading ? "Logging..." : "Login"}
+              </button>
+  
+            </form>
+  
+          </div>
+        </div>
+  
+      </div>
     </div>
   );
 }
