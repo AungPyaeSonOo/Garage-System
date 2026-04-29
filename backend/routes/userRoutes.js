@@ -206,4 +206,43 @@ router.post("/logout", (req, res) => {
   res.json({ message: "Logged out" });
 });
 
+router.post("/register", async (req, res) => {
+  try {
+    const { username, email, full_name, password, role } = req.body;
+
+    if (!username || !email || !full_name || !password) {
+      return res.status(400).json({ error: "All fields required" });
+    }
+
+    // check duplicate user
+    const exists = await pool.query(
+      "SELECT * FROM users WHERE username = $1 OR email = $2",
+      [username, email]
+    );
+
+    if (exists.rows.length > 0) {
+      return res.status(400).json({ error: "User already exists" });
+    }
+
+    // hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const result = await pool.query(
+      `INSERT INTO users (username, email, full_name, password_hash, role)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING user_id, username, email, full_name, role`,
+      [username, email, full_name, hashedPassword, role || "staff"]
+    );
+
+    res.json({
+      message: "User created successfully",
+      user: result.rows[0]
+    });
+
+  } catch (err) {
+    console.error("REGISTER ERROR:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 module.exports = { router, authenticateToken, isAdmin };
