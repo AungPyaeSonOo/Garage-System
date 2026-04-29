@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
 import "../styles/auth.css";
 
 function Login({ onLogin }) {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     username: "",
     password: ""
@@ -23,13 +26,11 @@ function Login({ onLogin }) {
     try {
       const res = await api.post("/users/login", formData);
 
-      const accessToken = res.data?.accessToken;
-      const refreshToken = res.data?.refreshToken;
-      const user = res.data?.user;
+      const { accessToken, refreshToken, user } = res.data;
 
-      // ✅ FIXED VALIDATION
       if (!accessToken || !refreshToken || !user) {
         setErrors({ general: "Invalid login response from server" });
+        setLoading(false);
         return;
       }
 
@@ -40,13 +41,12 @@ function Login({ onLogin }) {
 
       onLogin(user);
 
-      window.location.href = "/";
+      // ✅ NO FULL RELOAD
+      navigate("/");
 
     } catch (err) {
       setErrors({
-        general:
-          err.response?.data?.error ||
-          "Login failed"
+        general: err.response?.data?.error || "Login failed"
       });
     }
 
@@ -66,12 +66,14 @@ function Login({ onLogin }) {
           name="username"
           placeholder="Username"
           onChange={handleChange}
+          autoComplete="username"
         />
 
         <input
           name="password"
           type="password"
           placeholder="Password"
+          autoComplete="current-password"
           onChange={handleChange}
         />
 

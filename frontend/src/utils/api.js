@@ -25,12 +25,12 @@ api.interceptors.response.use(
     const originalRequest = err.config;
     const status = err.response?.status;
 
-    // prevent infinite loop
+    // ❌ Prevent infinite retry
     if (originalRequest._retry) {
       return Promise.reject(err);
     }
 
-    // TOKEN EXPIRED
+    // 🔥 TOKEN EXPIRED
     if (status === 401 || status === 403) {
       originalRequest._retry = true;
 
@@ -38,7 +38,7 @@ api.interceptors.response.use(
         const refreshToken = localStorage.getItem("refreshToken");
 
         if (!refreshToken) {
-          throw new Error("No refresh token");
+          return Promise.reject(err); // ❗ DON'T force logout here
         }
 
         const res = await axios.post(`${baseURL}/users/refresh`, {
@@ -51,10 +51,10 @@ api.interceptors.response.use(
           throw new Error("No new token");
         }
 
-        // save new token
+        // ✅ SAVE NEW TOKEN
         localStorage.setItem("accessToken", newAccessToken);
 
-        // retry request
+        // ✅ RETRY ORIGINAL REQUEST
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
 
@@ -62,7 +62,7 @@ api.interceptors.response.use(
         console.log("🔴 Refresh failed");
 
         localStorage.clear();
-        window.location.href = "/login";
+        window.location.replace("/login"); // safer redirect
       }
     }
 

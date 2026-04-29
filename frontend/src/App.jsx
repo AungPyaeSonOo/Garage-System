@@ -21,20 +21,19 @@ import EmployeePerformance from "./pages/EmployeePerformance";
 import "./styles/dashboard.css";
 
 function App() {
-  const [user, setUser] = useState(undefined); // ✅ IMPORTANT FIX
+  const [user, setUser] = useState(undefined);
   const [loading, setLoading] = useState(true);
 
-  // ✅ RESTORE SESSION (SAFE)
+  // ✅ FIXED SESSION RESTORE
   useEffect(() => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("accessToken"); // ✅ FIX HERE
       const savedUser = localStorage.getItem("user");
 
       console.log("🔐 RESTORE SESSION:", { token, savedUser });
 
       if (token && savedUser) {
-        const parsed = JSON.parse(savedUser);
-        setUser(parsed);
+        setUser(JSON.parse(savedUser));
       } else {
         setUser(null);
       }

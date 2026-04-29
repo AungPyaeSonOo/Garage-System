@@ -130,7 +130,7 @@ router.post("/login", async (req, res) => {
 });
 
 // ================= REFRESH TOKEN =================
-router.post("/refresh", (req, res) => {
+router.post("/refresh", async (req, res) => {
   const { refreshToken } = req.body;
 
   if (!refreshToken) {
@@ -140,8 +140,25 @@ router.post("/refresh", (req, res) => {
   try {
     const decoded = jwt.verify(refreshToken, JWT_SECRET);
 
+    // 🔥 GET FULL USER DATA
+    const result = await pool.query(
+      "SELECT user_id, username, role FROM users WHERE user_id = $1",
+      [decoded.user_id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(403).json({ error: "User not found" });
+    }
+
+    const user = result.rows[0];
+
+    // 🔥 FIXED TOKEN
     const newAccessToken = jwt.sign(
-      { user_id: decoded.user_id },
+      {
+        user_id: user.user_id,
+        username: user.username,
+        role: user.role
+      },
       JWT_SECRET,
       { expiresIn: "15m" }
     );
