@@ -28,12 +28,11 @@ function Dashboard() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // 🚨 CHECK TOKEN FIRST
-    const token = localStorage.getItem("token");
+    // ✅ FIX: use correct key
+    const token = localStorage.getItem("accessToken");
 
+    // ❗ DON'T redirect here (ProtectedRoute handles it)
     if (!token) {
-      console.log("🚫 No token → redirect login");
-      window.location.href = "/login";
       return;
     }
 
@@ -53,8 +52,8 @@ function Dashboard() {
     }
 
     return {
-      start: start.toISOString().split('T')[0],
-      end: now.toISOString().split('T')[0]
+      start: start.toISOString().split("T")[0],
+      end: now.toISOString().split("T")[0]
     };
   };
 
@@ -83,7 +82,6 @@ function Dashboard() {
 
     } catch (err) {
       console.error("Dashboard fetch error:", err);
-
       setError("Failed to load dashboard data. Please try again.");
     } finally {
       setLoading(false);
@@ -120,22 +118,22 @@ function Dashboard() {
 
         <div className="date-range-selector">
           <button
-            className={`range-btn ${dateRange === 'day' ? 'active' : ''}`}
-            onClick={() => setDateRange('day')}
+            className={`range-btn ${dateRange === "day" ? "active" : ""}`}
+            onClick={() => setDateRange("day")}
           >
             Today
           </button>
 
           <button
-            className={`range-btn ${dateRange === 'week' ? 'active' : ''}`}
-            onClick={() => setDateRange('week')}
+            className={`range-btn ${dateRange === "week" ? "active" : ""}`}
+            onClick={() => setDateRange("week")}
           >
             This Week
           </button>
 
           <button
-            className={`range-btn ${dateRange === 'month' ? 'active' : ''}`}
-            onClick={() => setDateRange('month')}
+            className={`range-btn ${dateRange === "month" ? "active" : ""}`}
+            onClick={() => setDateRange("month")}
           >
             This Month
           </button>
