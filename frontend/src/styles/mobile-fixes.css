@@ -1,0 +1,53 @@
+/* Force main content to take full width on mobile */
+@media (max-width: 768px) {
+    .dashboard-container {
+      flex-direction: column !important;
+    }
+  
+    .main-section {
+      margin-left: 0 !important;
+      padding: 15px !important;
+      width: 100% !important;
+      overflow-x: hidden !important;
+    }
+  
+    /* Stats grid – change to 1 column (or 2 if you prefer) */
+    .stats-grid {
+      grid-template-columns: 1fr !important;
+      gap: 15px !important;
+    }
+  
+    /* If you have a second grid (like charts-row or dashboard-bottom) */
+    .charts-row,
+    .dashboard-bottom {
+      grid-template-columns: 1fr !important;
+    }
+  
+    /* Tables should scroll horizontally */
+    .table-responsive {
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch;
+    }
+  
+    /* Ensure no element overflows */
+    body, html, .app, .main-section, .dashboard-container {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+  }
+  
+  /* Even smaller devices (max-width: 480px) – optional tweaks */
+  @media (max-width: 480px) {
+    .stats-grid {
+      grid-template-columns: 1fr !important;
+    }
+  
+    .stat-card {
+      padding: 12px !important;
+    }
+  
+    .stat-icon {
+      width: 40px !important;
+      height: 40px !important;
+    }
+  }
