@@ -102,7 +102,7 @@
   border-radius: 10px;
 }
 
-/* CUSTOMER */
+/* CUSTOMER + VEHICLE */
 .customer-vehicle-row {
   display: flex;
   gap: 20px;
@@ -173,18 +173,18 @@
 }
 
 /* =========================
-   🔥 80MM PRINT FIX (IMPORTANT)
+   🔥 80MM PRINT FIX (FINAL)
 ========================= */
 @media print {
 
-  /* Hide buttons */
+  /* hide buttons */
   .print-actions,
   .back-btn,
   .print-btn {
     display: none !important;
   }
 
-  /* ✅ FORCE 80mm paper */
+  /* 80mm paper setup */
   @page {
     size: 80mm auto;
     margin: 0;
@@ -197,7 +197,7 @@
     background: white;
   }
 
-  /* ✅ MAIN RECEIPT WIDTH */
+  /* main invoice container */
   .invoice-paper {
     width: 72mm !important;
     max-width: 72mm !important;
@@ -208,7 +208,7 @@
     font-size: 9pt !important;
   }
 
-  /* ✅ STACK layout (NO FLEX SIDE BY SIDE) */
+  /* header stack */
   .invoice-header {
     display: block !important;
     text-align: center !important;
@@ -218,17 +218,23 @@
     text-align: center !important;
   }
 
+  /* =========================
+     FIX: SIDE BY SIDE IN PRINT
+  ========================= */
   .customer-vehicle-row {
-    display: block !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    gap: 2mm !important;
   }
 
   .customer-column,
   .vehicle-column {
-    width: 100% !important;
-    margin-bottom: 5px;
+    width: 50% !important;
+    font-size: 7pt !important;
   }
 
-  /* ✅ SMALL TEXT */
+  /* text sizing */
   .company-info h1 {
     font-size: 12pt !important;
   }
@@ -250,7 +256,7 @@
     padding: 4px !important;
   }
 
-  /* ✅ TABLE FIX */
+  /* table fix */
   .invoice-table {
     table-layout: fixed;
     width: 100%;
@@ -263,7 +269,7 @@
     word-break: break-word;
   }
 
-  /* ✅ SUMMARY */
+  /* summary */
   .summary-row {
     font-size: 8pt !important;
   }
@@ -272,12 +278,11 @@
     font-size: 9pt !important;
   }
 
-  /* FOOTER */
+  /* footer */
   .invoice-footer {
     font-size: 7pt !important;
   }
 
-  /* color support */
   * {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
